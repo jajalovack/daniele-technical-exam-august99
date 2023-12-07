@@ -27,15 +27,13 @@ async function searchByQuery(query,dataPage)
             },
             body: JSON.stringify(
             {
-                'options':
-                {
-                    'query':
-                    {
-                        '$text':
-                        {
-                            'search': query
-                        }
-                    },
+                'query': {
+                    'name': {
+                        '$regex': query,
+                        '$options': 'i'
+                    }
+                },
+                'options': {
                     'page': dataPage
                 }
             })
@@ -50,6 +48,11 @@ async function searchByQuery(query,dataPage)
 
     for (i=0;i<10;i++)
     {
+        if (feedContent.docs[i]==undefined)
+        {
+            feed.innerHTML+='<center><i>End of results.</i></center>';
+            break;
+        }
         if (feedContent.docs[i].details==null)
         {
             feedContent.docs[i].details='No details available.';
@@ -139,10 +142,10 @@ document.addEventListener('keypress',(e)=>{
     {
         if (lastAccessed==0)
         {
-            dataPage=1;
+            lastAccessed=1
         }
+        dataPage=1;
         searchByQuery(document.getElementById('query').value,dataPage++);
-        lastAccessed=1;
     }
 });
 
