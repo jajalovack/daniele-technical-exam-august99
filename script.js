@@ -4,7 +4,10 @@ lastAccessed=0;
 async function searchByQuery(query,dataPage)
 {
     const feed=document.getElementsByClassName('feed')[0];
-    feed.innerHTML=''+
+    
+    if (dataPage==1)
+    {
+        feed.innerHTML=''+
         '<div class="lazyLoad">'+
             '<div class="thumbnail"></div>'+
             '<div class="lazyDetails">'+
@@ -12,34 +15,33 @@ async function searchByQuery(query,dataPage)
                 '<div class="lazySub"></div>'+
             '</div>'+
         '</div>';
-    if (dataPage==1)
-    {
-        response=await fetch(
-            'https://api.spacexdata.com/v4/launches/query',
-            {
-                method: 'POST',
-                body:
-                {
-                    query: query
-                }
-            }
-        );
-    }
-    else
-    {
-        response=await fetch(
-            'https://api.spacexdata.com/v4/launches/query/next',
-            {
-                method: 'POST',
-                body:
-                {
-                    query: query
-                }
-            }
-        );
     }
 
-    feed.innerHTML='';
+    response=await fetch(
+        'https://api.spacexdata.com/v4/launches/query',
+        {
+            method: 'POST',
+            body:
+            {
+                options:
+                {
+                    query:
+                    {
+                        $text:
+                        {
+                            search: query
+                        }
+                    },
+                    page: dataPage
+                }
+            }
+        }
+    );
+
+    if (dataPage==1)
+    {
+        feed.innerHTML='';
+    }
     feedContent=await response.json();
 
     for (i=0;i<10;i++)
@@ -77,13 +79,20 @@ async function displayAllLaunches(page)
     }
 
     response=await fetch(
-        'https://api.spacexdata.com/v4/launches/',
+        'https://api.spacexdata.com/v4/launches/query',
         {
-            method: 'GET',
+            method: 'POST',
             body:
             {
                 options:
                 {
+                    query:
+                    {
+                        $text:
+                        {
+                            search: query
+                        }
+                    },
                     page: page
                 }
             }
@@ -117,14 +126,25 @@ console.log(dataPage);
 document.addEventListener('keypress',(e)=>{
     if (e.key==='Enter')
     {
-        searchByQuery(document.getElementById('query').value,1);
+        if (lastAccessed==0)
+        {
+            dataPage=1;
+        }
+        searchByQuery(document.getElementById('query').value,dataPage++);
         lastAccessed=1;
-        dataPage=1;
     }
 });
 
 $(window).scroll(function() {
     if($(window).scrollTop() + $(window).height() == $(document).height()) {
-        displayAllLaunches(dataPage++);
+        if (lastAccessed==0)
+        {
+            displayAllLaunches(dataPage++);
+        }
+        else
+        {
+            searchByQuery(document.getElementById('query').value,dataPage++);
+            alert(dataPage);
+        }
     }
  });
