@@ -61,6 +61,8 @@ body
 {
     min-width: 95px;
     min-height: 95px;
+    max-width: 95px;
+    max-height: 95px;
     background-color: #f2f2f2;
 }
 

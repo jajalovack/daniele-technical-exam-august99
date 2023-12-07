@@ -21,20 +21,24 @@ async function searchByQuery(query,dataPage)
         'https://api.spacexdata.com/v4/launches/query',
         {
             method: 'POST',
-            body:
+            headers:
             {
-                options:
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify(
+            {
+                'options':
                 {
-                    query:
+                    'query':
                     {
-                        $text:
+                        '$text':
                         {
-                            search: query
+                            'search': query
                         }
                     },
-                    page: dataPage
+                    'page': dataPage
                 }
-            }
+            })
         }
     );
 
@@ -82,24 +86,31 @@ async function displayAllLaunches(page)
         'https://api.spacexdata.com/v4/launches/query',
         {
             method: 'POST',
-            body:
+            headers:
             {
-                options:
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify(
+            {
+                'query': {},
+                'options':
                 {
-                    query:
-                    {
-                        flight_number:
-                        {
-                            $gte: page*10-9,
-                            $lte: page*10
-                        }
-                    }
+                    'page': page
                 }
-            }
+            })
         }
     );
+    console.log(JSON.stringify(
+        {
+            query: {},
+            options:
+            {
+                page: page
+            }
+        }));
 
     feedContent=await response.json();
+    console.log(feedContent);
     if (page==1)
     {
         feed.innerHTML='';
@@ -145,5 +156,6 @@ $(window).scroll(function() {
         {
             searchByQuery(document.getElementById('query').value,dataPage++);
         }
+        console.log(dataPage);
     }
  });
