@@ -88,12 +88,12 @@ async function displayAllLaunches(page)
                 {
                     query:
                     {
-                        $text:
+                        flight_number:
                         {
-                            search: query
+                            $gte: page*10-9,
+                            $lte: page*10
                         }
-                    },
-                    page: page
+                    }
                 }
             }
         }
@@ -106,16 +106,16 @@ async function displayAllLaunches(page)
     }
     for (i=0;i<10;i++)
     {
-        if (feedContent[i].details==null)
+        if (feedContent.docs[i].details==null)
         {
-            feedContent[i].details='No details available.';
+            feedContent.docs[i].details='No details available.';
         }
         feed.innerHTML+=''+
             '<div class="launch">'+
-                '<div class="thumbnail" style="background-image: url('+feedContent[i].links.patch.large+'); background-size: contain;"></div>'+
+                '<div class="thumbnail" style="background-image: url('+feedContent.docs[i].links.patch.large+'); background-size: contain;"></div>'+
                 '<div class="details">'+
-                    '<h4>'+feedContent[i].flight_number+': '+feedContent[i].name+' ('+String(feedContent[i].date_utc).slice(0,4)+')</h4>'+
-                    '<p>'+feedContent[i].details+'</p>'+
+                    '<h4>'+feedContent.docs[i].flight_number+': '+feedContent.docs[i].name+' ('+String(feedContent.docs[i].date_utc).slice(0,4)+')</h4>'+
+                    '<p>'+feedContent.docs[i].details+'</p>'+
                 '</div>'+
             '</div>';
     }
@@ -144,7 +144,6 @@ $(window).scroll(function() {
         else
         {
             searchByQuery(document.getElementById('query').value,dataPage++);
-            alert(dataPage);
         }
     }
  });
